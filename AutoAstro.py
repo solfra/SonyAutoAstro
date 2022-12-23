@@ -13,7 +13,7 @@ from AAtools import *
 #-------------------- Inisialisation systèmes-------------------- 
 
 ast = AstrometryNet()
-ast.api_key = keyring.get_password('astroquery:astrometry_net', 'solfra38')
+ast.api_key = keyring.get_password('astroquery:astrometry_net', 'solfra38') # This API key must be changed
 
 os.system("gphoto2 --list-ports")
 os.system("gphoto2 --auto-detect ")
@@ -34,7 +34,7 @@ while test_img :
     if continue_test=='a' or continue_test =='A':
         f='test{}.arw'.format(i)
         fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-        result_ast=astrometry('test{}_b.fits'.format(i))
+        result_ast=astrometry('test{}_b.fits'.format(i),ast)
         fits.writeto('heder_result.fits', [], result_ast,overwrite=True)
         ra, dec = get_coord(result_ast)
         simbad_query(ra,dec)

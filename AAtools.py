@@ -9,18 +9,16 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astroquery.simbad import Simbad
 
-ast = AstrometryNet()
-ast.api_key = keyring.get_password('astroquery:astrometry_net', 'solfra38') # This API key must be changed
 
 #--------------------- Fonction utiles-------------------- 
 def img_read(file):
     '''
     Read and print a raw image from Sony camera
 
-    input : 
+    Input : 
     file (str) : name of the file to read
 
-    output :
+    Output :
     rgb (3d array) : image array
     '''
     raw = rawpy.imread(file)
@@ -30,7 +28,18 @@ def img_read(file):
     plt.show()
     return rgb
 
-def astrometry(file):
+def astrometry(file,ast):
+    '''
+    Compute astrometry for an image (fits)
+    Note this result can also been view online on nova.astrometry.net
+
+    Input :
+    file = name of the image 
+    ast = AstrometryNet()
+
+    Output :
+    wcs_header = result of the astrometry
+    '''
     try_again = True
     submission_id = None
     while try_again:
@@ -51,6 +60,15 @@ def astrometry(file):
     return wcs_header
 
 def get_coord(astrom) :
+    '''
+    Print and return coordone from the astrometry results in format hms / dms
+
+    Input :
+    astrom = astrometry wcs header
+
+    Output :
+    ra, dec = CRVAL 1 and 2 from wcs header
+    '''
     ra=astrom['CRVAL1']
     dec=astrom['CRVAL2']
     c= SkyCoord(ra*u.degree,dec*u.degree)
@@ -58,6 +76,16 @@ def get_coord(astrom) :
     return ra, dec
 
 def simbad_query(ra, dec, fov = 0.44) :
+    '''
+    Query simbad around ra, dec for giving object of NGC cataloge in the field of view of the camera
+
+    Input :
+    ra, dec = CRVAL 1 and 2 from wcs header
+    fov = field of view of the camera (in degree)
+
+    Output :
+    NaN
+    '''
     minRA = ra-fov
     maxRA = ra+fov
     minDEC = dec-fov
