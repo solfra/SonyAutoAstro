@@ -46,7 +46,7 @@ def astrometry(file,ast):
         try:
             if not submission_id:
                 print('submission')
-                wcs_header = ast.solve_from_image(file,submission_id=submission_id)
+                wcs_header = ast.solve_from_image(file,force_image_upload=True,submission_id=submission_id)
             else:
                 wcs_header = ast.monitor_submission(submission_id,solve_timeout=120)
                 i+=1
