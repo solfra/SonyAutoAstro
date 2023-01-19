@@ -1,0 +1,41 @@
+Before use
+==========
+
+Because Sony Auto Astro is a wraper software, you need to install some other tools.
+
+Gphoto
+******
+Gphoto is a powerfull linux softawre designed for control camera. This software is esential for SonyAutoAstro.
+
+Install with :
+
+.. code-block::
+    
+    sudo apt-get update
+    sudo apt-get install libusb-1.0-0-dev libtool libgphoto2-6 gphoto2
+
+Now, on your camera, turn on the pc mode on usb mode.
+
+You can check if the gphoto works with :
+
+.. code-block::
+
+    gphoto2 --list-ports
+    gphoto2 --auto-detect 
+    gphoto2 --summary
+
+Astrometry API key
+******************
+
+You need to change the api key for astrometry in AutoAstro.py. This software is esential for SonyAutoAstro.
+
+On a pyhton consol, run the folowing comand :
+
+.. code-block::
+
+    import keyring
+    keyring.set_password('astroquery:astrometry_net', None, 'apikeyhere')
+
+Change None to another name to assign usernames and use this usernames on AutoAstro.py line 16.
+
+See here for more details : https://astroquery.readthedocs.io/en/latest/astrometry_net/astrometry_net.html#using-keyring-to-store-api-key 

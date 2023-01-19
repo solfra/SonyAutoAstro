@@ -1,0 +1,7 @@
+Future improvement
+==================
+
+- Adding graphic interface
+- Control Celestron Nexstar telescope (realignment every x images)
+- Check collimation
+- Check focus

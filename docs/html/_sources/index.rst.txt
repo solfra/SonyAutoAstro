@@ -1,0 +1,19 @@
+.. SonyAutoAstro documentation master file, created by
+   sphinx-quickstart on Tue Jan  3 11:30:19 2023.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to SonyAutoAstro's documentation!
+=========================================
+
+Sony Auto astro is a powrful software for controle and use Sony camera in astronomy.
+It is developed for linux with python 3.
+
+.. toctree::
+   Home <self>
+   requirement 
+   Init
+   use
+   future
+   :maxdepth: 2
+   :caption: Contents:

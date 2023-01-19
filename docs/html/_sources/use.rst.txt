@@ -1,0 +1,60 @@
+Application
+===========
+
+* AutoAstro.py : Main software. make series of picture and saves in the curent directory.
+  
+* TrandfertTime.py : caracterise the time until gphoto save image in your folder.
+
+* fits_write.py read and save r, g, b layer of a specific image.
+
+
+AutoAstro
+*********
+The software guide you for inisialise link whith camera. After that, propose 
+to make some test for checking exposition parameter (adjustment to be made on the camera) 
+and telescope position (with astrometry). Until it is done, software realise a series of pictures. 
+
+Check before run
+----------------
+Before run the software, check the Before use part.
+
+Check also you are in the right folder for write your picture and you have free space on your disk.
+
+Your camera need to be in raw captur and in the usb mode pc control.
+
+Init
+----
+
+At the beginging, the software tel you to set the usb port used for gphoto. The information is avail on the 
+sumary on the controle.
+
+Test part
+---------
+
+The first part of the software is the test part.
+The software captur a picture and downlad it and tel you if you want to make an astrometry or re-do a captur. 
+The file are save under the name test{}.arw
+
+If you want to change the exposure of your image, you must make the settings directly on the camera.
+
+If you maeke an astrometry, the result is available on https://nova.astrometry.net/dashboard/submissions . 
+The softawre also display the ra,dec coordof your image and the ngc object in your fov (fond by a simbad query).
+
+When all is good, you can go to the main loop.
+
+Loop part
+---------
+
+In this part, you need to define the nomber of picture and their name.
+
+TransfertTime
+*************
+
+Thsi litle script captur 15 picture and estimate the time your computer nee to make the captur transfert. 
+For good aproximation, take your camera on the fastest speed available.
+All test image are delated at the end.
+
+FitsWrite
+***********
+
+This programme read a picture and save each rgb layer on a single fits file.
