@@ -8,18 +8,28 @@ from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astroquery.simbad import Simbad
+import configparser
 from AAtools import *
 
 #-------------------- Inisialisation systèmes-------------------- 
+config = configparser.ConfigParser()
+config.read('AA.cfg')
 
 ast = AstrometryNet()
-ast.api_key = keyring.get_password('astroquery:astrometry_net', 'solfra38') # This API key must be changed
+if config['astrometry']['user'] == '?' :
+    key = input("Name o the API key ? ")
+else :
+    key = config['astrometry']['user']
+ast.api_key = keyring.get_password('astroquery:astrometry_net', key) # This API key must be changed
 
 os.system("gphoto2 --list-ports")
 os.system("gphoto2 --auto-detect ")
 os.system("gphoto2 --summary")
 
-port = input("Entrer le nom du port USB a utiliser pour l'appareil photo : ")
+if config['gphoto']['port'] == '?' :
+    port = input("Entrer le nom du port USB a utiliser pour l'appareil photo : ")
+else :
+    port = config['gphoto']['port']
 
 #-------------------- Test du systèmes-------------------- 
 test_img = True
@@ -50,8 +60,16 @@ while test_img :
 capt  = True
 
 while capt : 
-    nbr = int(input('Combien de photo à prendre ? '))
-    name = input('Quel est le nom des images ? ')
+    if int(config['sky_object']['nbrPict']) == 0 :
+        nbr = int(input('Combien de photo à prendre ? '))
+    else : 
+        nbr = int(config['sky_object']['nbrPict'])
+    
+    if config['sky_object']['name'] == '?' :
+        name = input('Quel est le nom des images ? ')
+    else :
+        name = config['sky_object']['name']
+    
     for i in range(nbr):
         os.system("gphoto2 --port={} --filename={}.arw  --capture-image-and-download".format(port,name+'_'+str(i)))
 
