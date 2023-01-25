@@ -22,6 +22,29 @@ Check also you are in the right folder for write your picture and you have free 
 
 Your camera need to be in raw captur and in the usb mode pc control.
 
+AA.cfg config file
+------------------
+
+This config file is useful for improve productivity an automatisation of your setup. 
+If you don't know witch value used, leave the default values so that the software asks you.
+
+The config file is define as folow :
+
+gphoto :
+
+* port = the usb port used by the camera
+
+astrometry :
+
+* user = the user name define with keyring for astrometry tools (see Astrometry API key part for more information)
+
+sky_object :
+
+* name = name of the objects you observe
+
+* nbrpict = nomber of pictures you want to take
+
+
 Init
 ----
 
@@ -44,15 +67,18 @@ When all is good, you can go to the main loop.
 
 Loop part
 ---------
+This part is the main loop. The software take the number of photo you want.
 
-In this part, you need to define the nomber of picture and their name.
+You need to define the nomber of picture and their name if not define in AA.cfg.
+
+Check sometime if your object is allaws in the frame.
 
 TransfertTime
 *************
 
-Thsi litle script captur 15 picture and estimate the time your computer nee to make the captur transfert. 
-For good aproximation, take your camera on the fastest speed available.
-All test image are delated at the end.
+This little script capture 15 picture and estimates how long your computer needs to transfer the capture.  
+For good approximation, take your camera on the fastest speed available.
+All test images are deleted at the end.
 
 FitsWrite
 ***********

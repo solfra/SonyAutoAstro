@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Application &mdash; SonyAutoAstro 1.0 documentation</title>
+  <title>Application &mdash; SonyAutoAstro 1.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -44,6 +44,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Application</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#autoastro">AutoAstro</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#check-before-run">Check before run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aa-cfg-config-file">AA.cfg config file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#init">Init</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#test-part">Test part</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#loop-part">Loop part</a></li>
@@ -98,6 +99,25 @@ and telescope position (with astrometry). Until it is done, software realise a s
 <p>Check also you are in the right folder for write your picture and you have free space on your disk.</p>
 <p>Your camera need to be in raw captur and in the usb mode pc control.</p>
 </section>
+<section id="aa-cfg-config-file">
+<h3>AA.cfg config file<a class="headerlink" href="#aa-cfg-config-file" title="Permalink to this heading"></a></h3>
+<p>This config file is useful for improve productivity an automatisation of your setup.
+If you don’t know witch value used, leave the default values so that the software asks you.</p>
+<p>The config file is define as folow :</p>
+<p>gphoto :</p>
+<ul class="simple">
+<li><p>port = the usb port used by the camera</p></li>
+</ul>
+<p>astrometry :</p>
+<ul class="simple">
+<li><p>user = the user name define with keyring for astrometry tools (see Astrometry API key part for more information)</p></li>
+</ul>
+<p>sky_object :</p>
+<ul class="simple">
+<li><p>name = name of the objects you observe</p></li>
+<li><p>nbrpict = nomber of pictures you want to take</p></li>
+</ul>
+</section>
 <section id="init">
 <h3>Init<a class="headerlink" href="#init" title="Permalink to this heading"></a></h3>
 <p>At the beginging, the software tel you to set the usb port used for gphoto. The information is avail on the
@@ -115,14 +135,16 @@ The softawre also display the ra,dec coordof your image and the ngc object in yo
 </section>
 <section id="loop-part">
 <h3>Loop part<a class="headerlink" href="#loop-part" title="Permalink to this heading"></a></h3>
-<p>In this part, you need to define the nomber of picture and their name.</p>
+<p>This part is the main loop. The software take the number of photo you want.</p>
+<p>You need to define the nomber of picture and their name if not define in AA.cfg.</p>
+<p>Check sometime if your object is allaws in the frame.</p>
 </section>
 </section>
 <section id="transferttime">
 <h2>TransfertTime<a class="headerlink" href="#transferttime" title="Permalink to this heading"></a></h2>
-<p>Thsi litle script captur 15 picture and estimate the time your computer nee to make the captur transfert.
-For good aproximation, take your camera on the fastest speed available.
-All test image are delated at the end.</p>
+<p>This little script capture 15 picture and estimates how long your computer needs to transfer the capture.
+For good approximation, take your camera on the fastest speed available.
+All test images are deleted at the end.</p>
 </section>
 <section id="fitswrite">
 <h2>FitsWrite<a class="headerlink" href="#fitswrite" title="Permalink to this heading"></a></h2>

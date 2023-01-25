@@ -27,15 +27,15 @@ You can check if the gphoto works with :
 Astrometry API key
 ******************
 
-You need to change the api key for astrometry in AutoAstro.py. This software is esential for SonyAutoAstro.
+You need to change the api key for astrometry in AA.cfg. This software is esential for SonyAutoAstro.
 
-On a pyhton consol, run the folowing comand :
+On a python consol, run the folowing comand :
 
 .. code-block::
 
     import keyring
     keyring.set_password('astroquery:astrometry_net', None, 'apikeyhere')
 
-Change None to another name to assign usernames and use this usernames on AutoAstro.py line 16.
+Change None to another name to assign usernames and use this usernames on AA.cfg under user in Astrometry caategorie.
 
 See here for more details : https://astroquery.readthedocs.io/en/latest/astrometry_net/astrometry_net.html#using-keyring-to-store-api-key 

@@ -9,6 +9,8 @@ Welcome to SonyAutoAstro's documentation!
 Sony Auto astro is a powrful software for controle and use Sony camera in astronomy.
 It is developed for linux with python 3.
 
+This software have been tested with sony a5000 and sony a6600.
+
 .. toctree::
    Home <self>
    requirement 
