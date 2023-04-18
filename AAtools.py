@@ -8,7 +8,11 @@ from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astroquery.simbad import Simbad
-
+import configparser
+from AAnexstar import *
+import serial
+import time
+from urllib.request import urlopen
 
 #--------------------- Fonction utiles-------------------- 
 def img_read(file):
@@ -46,11 +50,9 @@ def astrometry(file,ast):
         try:
             if not submission_id:
                 print('submission')
-                wcs_header = ast.solve_from_image(file,force_image_upload=True,submission_id=submission_id)
+                wcs_header = ast.solve_from_image(file,force_image_upload = True, submission_id=submission_id)
             else:
                 wcs_header = ast.monitor_submission(submission_id,solve_timeout=120)
-                i+=1
-                print(i)
 
         except TimeoutError as e:
             submission_id = e.args[1]
@@ -92,3 +94,59 @@ def simbad_query(ra, dec, fov = 0.44) :
     maxDEC = dec+fov
     result = Simbad.query_criteria('ra>'+str(minRA)+'&ra<'+str(maxRA)+'&dec>'+str(minDEC)+'&dec<'+str(maxDEC),cat='NGC')
     print(result)
+
+def cfg_check(file='AA.cfg'):
+    config = configparser.ConfigParser()
+    try :
+        config.read(file)
+        int(config['sky_object']['nbrPict'])
+        key = config['astrometry']['user']
+        keyring.get_password('astroquery:astrometry_net', key)
+        int(config['astrometry']['check_every_x_imgs'])
+    except :
+        print("Error in config file")
+        exit()
+    else :
+        print("Config file : OK")
+
+def get_fov(header):
+    """
+    Get the fov of an image with is header of is plate solve
+
+    Input :
+    header : the fits header of the plate solve from astrometry.net   
+
+    Output : 
+    FOV in arcmin (tupple)
+    """
+    com = header['COMMENT']
+    for i in range(len(com)) :
+        l = com[-i].split(" ")
+        if l[0] == 'scale:' :
+            pixScal = float(l[1])
+            break
+    return (header['IMAGEW']*pixScal*60,header['IMAGEH']*pixScal*60)
+
+def internet_verif():
+    try :
+        urlopen('http://www.google.com')
+        print("internet is OK")
+    except :
+        print('Error ! Internet not conected !!!!!!!!!!!!!!!!')
+
+def nexstar_info(scope):
+    """
+    Print the information of the nexstar telescope
+
+    Input :
+    scope : the serial object of the telescope
+
+    Output :
+    None, just print information
+    """
+    print("tracking mode :", get_tracking(scope))
+    print("align mode", get_align(scope))
+    print("telescope time", get_time(scope,print_offset=True))
+    print("telescope localisation", get_location(scope))
+    print("position ALT/AZ", get_AZM_ALT_precise(scope))
+    print("position RA/DEC", get_RA_DEC_precise(scope))
