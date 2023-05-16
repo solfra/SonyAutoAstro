@@ -1,5 +1,7 @@
 import serial
 import time
+import datetime
+import logging
 
 def get_align(scope) :
     """
@@ -263,20 +265,110 @@ def get_location(scope) :
     long = posLong+str(ord(result[4]))+"d"+str(ord(result[5]))+"m"+str(ord(result[6]))+"s"
     return lat,long
 
-#def sync_precise_ra_dec(scope):
+def angle_to_hex_precise(angle):
+    """
+    Transform an angle in degree in to his value in hexadecimal 
+    For the nextstar mount, we need 4bits for the hex value
 
-#def goto_precise_azm_alt(scope) :
+    input : 
+    angle : the angle in degree
 
-#def goto_precise_ra_dec(scope) :
+    output :
+    angle : the angle in hex whith the good format 
+    """
+    angle_hex = hex(int((angle/360)*4294967296))[2:] 
+    n_angle = ""
+    for i in range(8-len(angle_hex)) :
+        n_angle+="0"
+    return n_angle+angle_hex
+
+def goto_precise_azm_alt(scope,azm,alt) :
+    """
+    Move the mount using the goto fonction to precise azm/alt position
+
+    input :
+    scope : the serial object of the telescop
+    azm : azimut position in degree
+    alt : altitide position in degree
+
+    output :
+    None, juste mouve the mount
+    """
+    azm_scope = angle_to_hex_precise(azm)
+    alt_scope = angle_to_hex_precise(alt)
+
+    c="b"+azm_scope+","+alt_scope
+    print(c)
+    scope.write(c.encode())
+    m=scope.read(1)
+
+def goto_precise_ra_dec(scope,ra,dec) :
+    """
+    Move the mount using the goto fonction to precise ra/dec position
+
+    input :
+    scope : the serial object of the telescop
+    ra : azimut position in degree
+    dec : altitide position in degree
+
+    output :
+    None, juste mouve the mount
+    """
+    ra_scope = angle_to_hex_precise(ra)
+    dec_scope = angle_to_hex_precise(dec)
+
+    c="r"+ra_scope+","+dec_scope
+    print(c)
+    scope.write(c.encode())
+    m=scope.read(1)
+
+def sync_precise_ra_dec(scope,ra,dec):
+    """
+    To Sync to an object via serial commands
+
+    input :
+    scope : the serial object of the telescop
+    ra : azimut position in degree
+    dec : altitide position in degree
+
+    output :
+    None, juste sync the mount
+    """
+    ra_scope = angle_to_hex_precise(ra)
+    dec_scope = angle_to_hex_precise(dec)
+
+    c="s"+ra_scope+","+dec_scope
+    scope.write(c.encode())
+    m=scope.read(1)
+
 
 #def set_location(scope) :
 
-#def set_time(scope) :
+def set_time(scope,utc=1,daylight=1) :
+    """
+    Set the telescopet time to the computer time
+
+    input :
+    scope : the serial object of the telescop
+    utc : the timezone. By deault 1
+    daylight : 1 if yes, 0 if no
+
+    output :
+    None, juste modify the time of the mount
+    """
+    logging.info("Set nexstar time")
+    dt= str(datetime.datetime.now())
+    d=dt.split(" ")[0].split("-")
+    t=dt.split(" ")[1].split(":")
+    c="H" + chr(int(t[0]))+chr(int(t[1]))+chr(int(float(t[2])))+chr(int(d[1]))+chr(int(d[2])) + chr(int(d[0][2:])) + chr(utc)+chr(daylight)
+    scope.write(c.encode())
+    m=scope.read(1)
 
 
-#scope = serial.Serial("/dev/ttyUSB0") #attention port peut changer !
+#scope = serial.Serial("/dev/ttyUSB1") #attention port peut changer !
 #print(get_AZM_ALT(scope))
 #print(get_AZM_ALT_precise(scope))
+#goto_precise_azm_alt(scope,0,50)
 #print("mode", get_tracking(scope))
 #modif_tracking(scope,1)
 #mouv_telescope(scope, ["ALT","pos"],8,2)

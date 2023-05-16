@@ -9,8 +9,10 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astroquery.simbad import Simbad
 import configparser
-import logging
 from AAtools import *
+import serial
+from AAnexstar import *
+import logging
 
 #-------------------- Inisialisation systèmes-------------------- 
 logging.basicConfig(filename="AutoAstro.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
@@ -52,13 +54,22 @@ if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord']
         logging.error("Error in object query")
         exit()
 
+logging.info("Nexstar inisialisation")
+if config['nexstar']['port'] == '?' :
+    nexstar_port = input("Nexstar usb port : ")
+else :
+    nexstar_port = config['nexstar']['port'] 
+logging.info("Nexstar port %s", nexstar_port)
+logging.info("Start nexstar serial port")
+scope = serial.Serial(nexstar_port)
+set_time(scope,utc=1,daylight=1)
 
 #-------------------- Test du systèmes-------------------- 
 logging.info("Start systeme test")
+nexstar_info(scope)
+
 test_img = True
 i=0 #numero de l'image test
-
-
 
 while test_img :
     logging.info("Capture image test %s", i)
@@ -66,16 +77,20 @@ while test_img :
     
     rgb=img_read('test{}.arw'.format(i))
 
-    continue_test = input("\nQue voulez vous faire ? \nAstrometrie (a) \nContinuer test (Y/n) ")
+    continue_test = input("\nQue voulez vous faire ? \nAstrometrie (a) \nSyncronisation telescope (s) \nContinuer test (Y/n) ")
     
     if continue_test=='a' or continue_test =='A':
         logging.info("Astrometry of the image")
         f='test{}.arw'.format(i)
         fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-
-        astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
+        c_img = astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
 
         continue_test = input("\nQue voulez vous faire ? \nContinuer test (Y/n) ")
+    
+    if continue_test=='s' or continue_test == 'S' :
+        logging.info("Sync mount with last coord obtened by astrometry")
+        print("Syncronisation du telescope avec les derniere coordonnes obtenue par astrometrie")
+        sync_precise_ra_dec(scope,c_img.ra.deg,c_img.dec.deg)
 
     if continue_test == "N" or continue_test == "n" :
         logging.info("End of systeme test")
@@ -84,7 +99,6 @@ while test_img :
     i+=1
 
 #-------------------- Capture des images --------------------
-
 logging.info("Start image capture")
 capt  = True
 
@@ -94,7 +108,7 @@ while capt :
     else : 
         nbr = int(config['sky_object']['nbrPict'])
     logging.info("Number of image you want : %s", nbr)
-    
+
     if config['sky_object']['name'] == '?' :
         name = input('Quel est le nom des images ? ')
     else :
@@ -106,12 +120,12 @@ while capt :
         os.system("gphoto2 --port={} --filename={}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,name+'_'+str(i)))
         
         if int(config['astrometry']['check_every_x_imgs']) != 0 and i % int(config['astrometry']['check_every_x_imgs']) == 0 and i!=0:
-            logging.info("check coord image")
+            logging.info("Check coord image")
             f=name+'_'+str(i)+'.arw'
             raw = rawpy.imread(f)
             rgb = raw.postprocess(use_camera_wb=True)
             raw.close()
-            logging.info("Convert into fits file")
+            logging.info("convert into fits file")
             fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
             astromerty_img(config, ast, c_obj, f[:-4]+'_b.fits')
 

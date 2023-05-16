@@ -13,6 +13,7 @@ from AAnexstar import *
 import serial
 import time
 from urllib.request import urlopen
+import logging
 
 #--------------------- Fonction utiles-------------------- 
 def img_read(file):
@@ -25,9 +26,11 @@ def img_read(file):
     Output :
     rgb (3d array) : image array
     '''
+    logging.info("read image")
     raw = rawpy.imread(file)
     rgb = raw.postprocess(use_camera_wb=True)
     raw.close()
+    logging.info("print image")
     plt.imshow(rgb)
     plt.show()
     return rgb
@@ -75,6 +78,7 @@ def get_coord(astrom) :
     dec=astrom['CRVAL2']
     c= SkyCoord(ra*u.degree,dec*u.degree)
     print('RA =',c.ra.hms[0],'h',c.ra.hms[1],'min',c.ra.hms[2],'s','\nDEC =',c.dec.dms[0],'deg',c.dec.dms[1],'min',c.dec.dms[2],'sec')
+    logging.info("coord center image : ra : %s ; dec : %s", ra, dec)
     return ra, dec
 
 def simbad_query(ra, dec, fov = 0.44) :
@@ -105,9 +109,11 @@ def cfg_check(file='AA.cfg'):
         int(config['astrometry']['check_every_x_imgs'])
     except :
         print("Error in config file")
+        logging.error("Error in config file")
         exit()
     else :
-        print("Config file : OK")
+        print("Config file OK")
+        logging.info("config file ok")
 
 def get_fov(header):
     """
@@ -129,10 +135,33 @@ def get_fov(header):
 
 def internet_verif():
     try :
-        urlopen('http://www.google.com')
+        urlopen('https://www.google.com')
         print("internet is OK")
+        logging.info("Internet is ok")
     except :
         print('Error ! Internet not conected !!!!!!!!!!!!!!!!')
+        logging.error("Internet not conected")
+
+def astromerty_img(config, ast, c_obj, fits_file):
+    result_ast=astrometry(fits_file,ast)
+    fits.writeto('heder_result.fits', [], result_ast,overwrite=True)
+    ra, dec = get_coord(result_ast)
+    fov = get_fov(result_ast)
+
+    if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord'] == 'Y' :
+        c_img = SkyCoord(ra*u.deg,dec*u.deg)
+        sep = c_img.separation(c_obj)
+        print("Separation obj image :",sep.arcmin,"arcmin")
+        logging.info("Separation obj image : %s arcmin",sep.arcmin)
+        print("Plus precisement :",(c_obj.ra.deg - c_img.ra.deg)*60, "arcmin en RA et", (c_obj.dec.deg - c_img.dec.deg)*60,"arcmin en DEC")
+        if sep > max(fov) :
+            print("Cible hors champ !")
+            print("Objects dans le champ actuel : ")
+            simbad_query(ra,dec,fov=max(fov)*60)
+    else :
+        print("Objects dans le champ actuel : ")
+        simbad_query(ra,dec,fov=max(fov)*60)
+    return c_img
 
 def nexstar_info(scope):
     """
@@ -150,3 +179,12 @@ def nexstar_info(scope):
     print("telescope localisation", get_location(scope))
     print("position ALT/AZ", get_AZM_ALT_precise(scope))
     print("position RA/DEC", get_RA_DEC_precise(scope))
+
+def nexstar_obj_centering(scope,ra_obj,dec_obj):
+    ra_scope, dec_scope = get_RA_DEC_precise(scope)
+    c_obj = SkyCoord(ra_obj*u.deg, dec_obj*u.deg)
+    c_scope = SkyCoord(ra_scope*u.deg,dec_scope*u.deg)
+    if c_obj.separation(c_scope).deg > 7 :
+        goto_precise_ra_dec(scope,ra_obj,dec_obj)
+    else :
+        print("mv scope")
