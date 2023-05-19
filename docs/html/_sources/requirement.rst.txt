@@ -1,7 +1,6 @@
 Requirement
 ===========
 
-
 - gphoto 
 - astrometry.net api key
 - python 3

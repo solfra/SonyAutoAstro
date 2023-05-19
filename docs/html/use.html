@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Application &mdash; SonyAutoAstro 1.1 documentation</title>
@@ -11,6 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -26,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> SonyAutoAstro
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SonyAutoAstro
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -42,12 +48,12 @@
 <li class="toctree-l1"><a class="reference internal" href="requirement.html">Requirement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Init.html">Before use</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Application</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#autoastro">AutoAstro</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#autoastro-and-autoastro-nexstar">AutoAstro and AutoAstro_nexstar</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#check-before-run">Check before run</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#aa-cfg-config-file">AA.cfg config file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#init">Init</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#test-part">Test part</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loop-part">Loop part</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#initialisation">Initialisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test">Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main">Main</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#transferttime">TransfertTime</a></li>
@@ -70,7 +76,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Application</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/use.rst.txt" rel="nofollow"> View page source</a>
@@ -84,25 +90,33 @@
   <section id="application">
 <h1>Application<a class="headerlink" href="#application" title="Permalink to this heading"></a></h1>
 <ul class="simple">
-<li><p>AutoAstro.py : Main software. make series of picture and saves in the curent directory.</p></li>
+<li><p>AutoAstro.py : Main software. Make series of picture and saves in the curent directory, check astrometry position.</p></li>
+<li><p>AutoAstro_nexstar.py : Same as AutoAstropy but also control nexstar telescope.</p></li>
 <li><p>TrandfertTime.py : caracterise the time until gphoto save image in your folder.</p></li>
 <li><p>fits_write.py read and save r, g, b layer of a specific image.</p></li>
 </ul>
-<section id="autoastro">
-<h2>AutoAstro<a class="headerlink" href="#autoastro" title="Permalink to this heading"></a></h2>
-<p>The software guide you for inisialise link whith camera. After that, propose
-to make some test for checking exposition parameter (adjustment to be made on the camera)
-and telescope position (with astrometry). Until it is done, software realise a series of pictures.</p>
+<section id="autoastro-and-autoastro-nexstar">
+<h2>AutoAstro and AutoAstro_nexstar<a class="headerlink" href="#autoastro-and-autoastro-nexstar" title="Permalink to this heading"></a></h2>
+<p>The software guides you to establish the connection with the camera.
+Then, it proposes to make some tests to check the exposure parameters (adjustment to be made on the camera)
+and the position of the telescope (with astrometry). and the position of the telescope (with astrometry).
+Finally, the software makes a series of images, with a periodic verification of the position of the telescope.
+If AutoAstro_nexstar, the software also recenters the telescope when checking the position to always have the right position.</p>
+<p>A log file is available to keep track of the operation of the software during the night of acquisition.</p>
 <section id="check-before-run">
 <h3>Check before run<a class="headerlink" href="#check-before-run" title="Permalink to this heading"></a></h3>
 <p>Before run the software, check the Before use part.</p>
-<p>Check also you are in the right folder for write your picture and you have free space on your disk.</p>
-<p>Your camera need to be in raw captur and in the usb mode pc control.</p>
+<p>An internet connection is required for using astrometry and simbad query.
+Check also you are in the right folder for write your picture and you have free space on your disk.
+The AA.cfg file must be in this folder and must be completed.</p>
+<p>Your camera must be in raw mode and in usb pc remote control mode.</p>
+<p>If AutoAstro_nexstar, your telescope must be aligned.</p>
 </section>
 <section id="aa-cfg-config-file">
 <h3>AA.cfg config file<a class="headerlink" href="#aa-cfg-config-file" title="Permalink to this heading"></a></h3>
-<p>This config file is useful for improve productivity an automatisation of your setup.
-If you don’t know witch value used, leave the default values so that the software asks you.</p>
+<p>This configuration file is useful to improve the productivity and automation of your installation.
+If you don’t know the value used, leave the default values so that the software will ask you for them.
+This configuration file must be located in the folder where you run AutoAstro.py!</p>
 <p>The config file is define as folow :</p>
 <p>gphoto :</p>
 <ul class="simple">
@@ -111,44 +125,58 @@ If you don’t know witch value used, leave the default values so that the softw
 <p>astrometry :</p>
 <ul class="simple">
 <li><p>user = the user name define with keyring for astrometry tools (see Astrometry API key part for more information)</p></li>
+<li><p>check_every_x_imgs = how often the software should check the position by astrometry. 0 means no verification</p></li>
 </ul>
 <p>sky_object :</p>
 <ul class="simple">
-<li><p>name = name of the objects you observe</p></li>
-<li><p>nbrpict = nomber of pictures you want to take</p></li>
+<li><p>name = name of the objects you observe. This field must not contain space character</p></li>
+<li><p>nbrpict = the number of photos you want to take</p></li>
+<li><p>get_coord = (y/n) get the coordinate of your target by a simbad quering. If yes, the name field must be a valid object name</p></li>
+</ul>
+<p>nexstar (optional part) :</p>
+<ul class="simple">
+<li><p>port = the usb port used by the telescope</p></li>
 </ul>
 </section>
-<section id="init">
-<h3>Init<a class="headerlink" href="#init" title="Permalink to this heading"></a></h3>
-<p>At the beginging, the software tel you to set the usb port used for gphoto. The information is avail on the
-sumary on the controle.</p>
+<section id="initialisation">
+<h3>Initialisation<a class="headerlink" href="#initialisation" title="Permalink to this heading"></a></h3>
+<p>At the beginning, the software checks some information.</p>
+<ul class="simple">
+<li><p>Check if your config file is OK</p></li>
+<li><p>Verification of an internet connection (required by astrometry and for a simbad request)</p></li>
+<li><p>Connection to astrometry using your api key</p></li>
+<li><p>gphoto2 initialisation. At this moment the software tel you which port using for control your camera if the information is not in AA.cfg</p></li>
+<li><p>Get the coordinate of your object (obteined by a simbad query)</p></li>
+<li><p>(optional) nexstar initialisation. At this moment the software tel you which port using for control your telescope if the information is not in AA.cfg. Also activate the serial port, adjust the date and time of your telescope and print some control information.</p></li>
+</ul>
 </section>
-<section id="test-part">
-<h3>Test part<a class="headerlink" href="#test-part" title="Permalink to this heading"></a></h3>
+<section id="test">
+<h3>Test<a class="headerlink" href="#test" title="Permalink to this heading"></a></h3>
 <p>The first part of the software is the test part.
-The software captur a picture and downlad it and tel you if you want to make an astrometry or re-do a captur.
-The file are save under the name test{}.arw</p>
-<p>If you want to change the exposure of your image, you must make the settings directly on the camera.</p>
-<p>If you maeke an astrometry, the result is available on <a class="reference external" href="https://nova.astrometry.net/dashboard/submissions">https://nova.astrometry.net/dashboard/submissions</a> .
-The softawre also display the ra,dec coordof your image and the ngc object in your fov (fond by a simbad query).</p>
-<p>When all is good, you can go to the main loop.</p>
+The software captures an image, downloads it and asks you if you want to do an astrometry or a re-capture.
+The files are saved under the name test{}.arw</p>
+<p>If you want to change the shooting parameters, you must make the settings directly on the camera.</p>
+<p>If you make an astrometry, the result is available on <a class="reference external" href="https://nova.astrometry.net/dashboard/submissions">https://nova.astrometry.net/dashboard/submissions</a> .
+The software also displays the ra,dec coordinates of your image and the ngc object in your fov (found by a simbad query).
+If nexstar, you can also synchronize your telescope with these coordinates.</p>
+<p>When everything is in order, you can exit the test loop and move on to the main loop.</p>
 </section>
-<section id="loop-part">
-<h3>Loop part<a class="headerlink" href="#loop-part" title="Permalink to this heading"></a></h3>
-<p>This part is the main loop. The software take the number of photo you want.</p>
-<p>You need to define the nomber of picture and their name if not define in AA.cfg.</p>
-<p>Check sometime if your object is allaws in the frame.</p>
+<section id="main">
+<h3>Main<a class="headerlink" href="#main" title="Permalink to this heading"></a></h3>
+<p>This part is the main loop. The software take the number of photo you want.
+Is define in AA.cfg, the software also make a periodic astrometry of your image and refocuses your telescope if AutoAstro_nexstar and if necessary.</p>
+<p>You have to define the number of images and their name if it is not the case in AA.cfg.</p>
 </section>
 </section>
 <section id="transferttime">
 <h2>TransfertTime<a class="headerlink" href="#transferttime" title="Permalink to this heading"></a></h2>
-<p>This little script capture 15 picture and estimates how long your computer needs to transfer the capture.
-For good approximation, take your camera on the fastest speed available.
-All test images are deleted at the end.</p>
+<p>This little script captures 15 images and estimates how long it will take your computer to transfer the capture.
+For a good approximation, take your camera at the fastest possible speed.
+All tested images are deleted at the end.</p>
 </section>
 <section id="fitswrite">
 <h2>FitsWrite<a class="headerlink" href="#fitswrite" title="Permalink to this heading"></a></h2>
-<p>This programme read a picture and save each rgb layer on a single fits file.</p>
+<p>This program reads an image and saves each rgb layer in a single fits file.</p>
 </section>
 </section>
 

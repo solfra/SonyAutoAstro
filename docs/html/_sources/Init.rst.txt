@@ -1,11 +1,11 @@
 Before use
 ==========
 
-Because Sony Auto Astro is a wraper software, you need to install some other tools.
+Because Sony Auto Astro uses other software, it is necessary to install these tools.
 
 Gphoto
 ******
-Gphoto is a powerfull linux softawre designed for control camera. This software is esential for SonyAutoAstro.
+Gphoto is a powerfull linux softawre designed to control camera. This software is essential for SonyAutoAstro.
 
 Install with :
 
@@ -14,9 +14,9 @@ Install with :
     sudo apt-get update
     sudo apt-get install libusb-1.0-0-dev libtool libgphoto2-6 gphoto2
 
-Now, on your camera, turn on the pc mode on usb mode.
+Now, on your camera, change the usb mode into remote computer.
 
-You can check if the gphoto works with :
+You can check if gphoto2 works with :
 
 .. code-block::
 
@@ -27,7 +27,8 @@ You can check if the gphoto works with :
 Astrometry API key
 ******************
 
-You need to change the api key for astrometry in AA.cfg. This software is esential for SonyAutoAstro.
+You need to have an api key for nova.astrometry.net. This is essential for SonyAutoAstro.
+To obtain this api key, create an account on https://nova.astrometry.net/. Your api key is available in your profil page.
 
 On a python consol, run the folowing comand :
 
@@ -36,6 +37,6 @@ On a python consol, run the folowing comand :
     import keyring
     keyring.set_password('astroquery:astrometry_net', None, 'apikeyhere')
 
-Change None to another name to assign usernames and use this usernames on AA.cfg under user in Astrometry caategorie.
+Change None to another name to assign a user name to this key and use these user names in AA.cfg, in user in the Astrometry category.
 
 See here for more details : https://astroquery.readthedocs.io/en/latest/astrometry_net/astrometry_net.html#using-keyring-to-store-api-key 

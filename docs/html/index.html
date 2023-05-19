@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to SonyAutoAstro’s documentation! &mdash; SonyAutoAstro 1.1 documentation</title>
@@ -11,6 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -25,11 +27,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> SonyAutoAstro
+
+          
+          
+          <a href="#" class="icon icon-home">
+            SonyAutoAstro
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -57,7 +63,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a></li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Welcome to SonyAutoAstro’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
@@ -70,9 +76,12 @@
              
   <section id="welcome-to-sonyautoastro-s-documentation">
 <h1>Welcome to SonyAutoAstro’s documentation!<a class="headerlink" href="#welcome-to-sonyautoastro-s-documentation" title="Permalink to this heading"></a></h1>
-<p>Sony Auto astro is a powrful software for controle and use Sony camera in astronomy.
+<p>Sony Auto astro is a powrful software for controle and use Sony camera in astronomy and, in option, control a Celestron nexstar telescope.
 It is developed for linux with python 3.</p>
-<p>This software have been tested with sony a5000 and sony a6600.</p>
+<p>This software have been tested with sony a5000 and sony a6600.
+An internet connection is required for using astrometry and simbad query.</p>
+<p>Whith this software, you can controle a Sony camera, make astrometry of your images, calculate the the deviation between your image and the position of the desired object.</p>
+<p>You can also controle a nexstar SE telescope (alt/az configuration). This part is optional.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
@@ -84,7 +93,7 @@ It is developed for linux with python 3.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="use.html">Application</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="use.html#autoastro">AutoAstro</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#autoastro-and-autoastro-nexstar">AutoAstro and AutoAstro_nexstar</a></li>
 <li class="toctree-l2"><a class="reference internal" href="use.html#transferttime">TransfertTime</a></li>
 <li class="toctree-l2"><a class="reference internal" href="use.html#fitswrite">FitsWrite</a></li>
 </ul>

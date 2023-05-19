@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Before use &mdash; SonyAutoAstro 1.1 documentation</title>
@@ -11,6 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -26,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> SonyAutoAstro
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SonyAutoAstro
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -62,7 +68,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Before use</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/Init.rst.txt" rel="nofollow"> View page source</a>
@@ -75,17 +81,17 @@
              
   <section id="before-use">
 <h1>Before use<a class="headerlink" href="#before-use" title="Permalink to this heading"></a></h1>
-<p>Because Sony Auto Astro is a wraper software, you need to install some other tools.</p>
+<p>Because Sony Auto Astro uses other software, it is necessary to install these tools.</p>
 <section id="gphoto">
 <h2>Gphoto<a class="headerlink" href="#gphoto" title="Permalink to this heading"></a></h2>
-<p>Gphoto is a powerfull linux softawre designed for control camera. This software is esential for SonyAutoAstro.</p>
+<p>Gphoto is a powerfull linux softawre designed to control camera. This software is essential for SonyAutoAstro.</p>
 <p>Install with :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
 <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libusb</span><span class="o">-</span><span class="mf">1.0</span><span class="o">-</span><span class="mi">0</span><span class="o">-</span><span class="n">dev</span> <span class="n">libtool</span> <span class="n">libgphoto2</span><span class="o">-</span><span class="mi">6</span> <span class="n">gphoto2</span>
 </pre></div>
 </div>
-<p>Now, on your camera, turn on the pc mode on usb mode.</p>
-<p>You can check if the gphoto works with :</p>
+<p>Now, on your camera, change the usb mode into remote computer.</p>
+<p>You can check if gphoto2 works with :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gphoto2</span> <span class="o">--</span><span class="nb">list</span><span class="o">-</span><span class="n">ports</span>
 <span class="n">gphoto2</span> <span class="o">--</span><span class="n">auto</span><span class="o">-</span><span class="n">detect</span>
 <span class="n">gphoto2</span> <span class="o">--</span><span class="n">summary</span>
@@ -94,13 +100,14 @@
 </section>
 <section id="astrometry-api-key">
 <h2>Astrometry API key<a class="headerlink" href="#astrometry-api-key" title="Permalink to this heading"></a></h2>
-<p>You need to change the api key for astrometry in AA.cfg. This software is esential for SonyAutoAstro.</p>
+<p>You need to have an api key for nova.astrometry.net. This is essential for SonyAutoAstro.
+To obtain this api key, create an account on <a class="reference external" href="https://nova.astrometry.net/">https://nova.astrometry.net/</a>. Your api key is available in your profil page.</p>
 <p>On a python consol, run the folowing comand :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">keyring</span>
 <span class="n">keyring</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s1">&#39;astroquery:astrometry_net&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;apikeyhere&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Change None to another name to assign usernames and use this usernames on AA.cfg under user in Astrometry caategorie.</p>
+<p>Change None to another name to assign a user name to this key and use these user names in AA.cfg, in user in the Astrometry category.</p>
 <p>See here for more details : <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/astrometry_net/astrometry_net.html#using-keyring-to-store-api-key">https://astroquery.readthedocs.io/en/latest/astrometry_net/astrometry_net.html#using-keyring-to-store-api-key</a></p>
 </section>
 </section>
