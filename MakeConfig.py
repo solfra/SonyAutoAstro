@@ -16,6 +16,9 @@ config['sky_object']['get_coord'] = 'n'
 
 config['nexstar'] = {}
 config['nexstar']['port'] = '?'
+config['nexstar']['max_test'] = '5'
+config['nexstar']['UTC'] = '1'
+config['nexstar']['daylight'] = '0'
 
 with open('AA.cfg', 'w') as configfile:
   config.write(configfile)
