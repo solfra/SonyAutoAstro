@@ -228,12 +228,18 @@ def get_time(scope,print_offset=False) :
     print_offset (optional, True or False) : an option to allowd to print more information (UTC time and daylight)
 
     Output :
-    t : Time in format AAAA-mm-dd hh:mm:ss 
+    t : UTC Time in format AAAA-mm-dd hh:mm:ss 
     """
     c='h'
     scope.write(c.encode())
     result=scope.read(9).decode("utf-8")
-    t = '20'+str(ord(result[5]))+'-'+str(ord(result[3]))+'-'+str(ord(result[4]))+' '+str(ord(result[0]))+':'+str(ord(result[1]))+':'+str(ord(result[2]))
+    dif_utc = ord(result[6]) + ord(result[7])
+    d = ord(result[4])
+    h = ord(result[0])
+    if h < dif_utc :
+        d=d-1
+        h=(h-dif_utc)%24
+    t = '20'+str(ord(result[5]))+'-'+str(ord(result[3]))+'-'+str(d)+' '+str(h)+':'+str(ord(result[1]))+':'+str(ord(result[2]))
     if print_offset :
         print("utc+",str(ord(result[6])))
         print("Heure ete ? ",str(ord(result[7])))

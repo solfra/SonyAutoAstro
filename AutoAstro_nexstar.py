@@ -62,11 +62,13 @@ else :
 logging.info("Nexstar port %s", nexstar_port)
 logging.info("Start nexstar serial port")
 scope = serial.Serial(nexstar_port)
-set_time(scope,utc=1,daylight=1)
+set_time(scope,utc=int(config['nexstar']['UTC']),daylight=int(config['nexstar']['daylight']))
+nexstar_info(scope)
+lat,long = get_location(scope)
+
 
 #-------------------- Test du systèmes-------------------- 
 logging.info("Start systeme test")
-nexstar_info(scope)
 
 test_img = True
 i=0 #numero de l'image test
@@ -77,20 +79,20 @@ while test_img :
     
     rgb=img_read('test{}.arw'.format(i))
 
-    continue_test = input("\nQue voulez vous faire ? \nAstrometrie (a) \nSyncronisation telescope (s) \nContinuer test (Y/n) ")
+    continue_test = input("\nQue voulez vous faire ? \nAstrometrie (a) \nContinuer test (Y/n) ")
     
     if continue_test=='a' or continue_test =='A':
         logging.info("Astrometry of the image")
         f='test{}.arw'.format(i)
         fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-        c_img = astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
+        c_img, fov = astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
 
-        continue_test = input("\nQue voulez vous faire ? \nContinuer test (Y/n) ")
+        continue_test = input("\nQue voulez vous faire ? \nSyncronisation telescope (s) \nContinuer test (Y/n) ")
     
-    if continue_test=='s' or continue_test == 'S' :
-        logging.info("Sync mount with last coord obtened by astrometry")
-        print("Syncronisation du telescope avec les derniere coordonnes obtenue par astrometrie")
-        sync_precise_ra_dec(scope,c_img.ra.deg,c_img.dec.deg)
+        if continue_test=='s' or continue_test == 'S' :
+            logging.info("Sync mount with last coord obtened by astrometry")
+            print("Syncronisation du telescope avec les derniere coordonnes obtenue par astrometrie")
+            sync_precise_ra_dec(scope,c_img.ra.deg,c_img.dec.deg)
 
     if continue_test == "N" or continue_test == "n" :
         logging.info("End of systeme test")
@@ -117,17 +119,36 @@ while capt :
     
     for i in range(nbr):
         logging.info("Capture image %s", i)
+        t = get_time(scope)
         os.system("gphoto2 --port={} --filename={}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,name+'_'+str(i)))
         
         if int(config['astrometry']['check_every_x_imgs']) != 0 and i % int(config['astrometry']['check_every_x_imgs']) == 0 and i!=0:
-            logging.info("Check coord image")
+            centering = True
+            i_center = 1
+        
+        if i_center > int(config['nexstar']['max_test']) :
+            print("Error in centering, make it manualy")
+            logging.error("Error in centering, make it manualy")
+            logging.info('End of the programm')
+            print("End of the programm")
+            goto_precise_azm_alt(scope, 0,0)
+            exit()
+
+        if centering :
+            logging.info("Check image coordinates")
             f=name+'_'+str(i)+'.arw'
             raw = rawpy.imread(f)
             rgb = raw.postprocess(use_camera_wb=True)
             raw.close()
             logging.info("convert into fits file")
             fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-            astromerty_img(config, ast, c_obj, f[:-4]+'_b.fits')
+            c_img, fov = astromerty_img(config, ast, c_obj, f[:-4]+'_b.fits')
+            if abs(c_img.separation(c_obj).arcmin) > max(fov)/2 :
+                logging.info("Nexstar centering")
+                nexstar_obj_centering(scope,c_obj,c_img,t, lat,long)
+                i_center += 1
+            else :
+                centering = False
 
     print('\n**************\nFin des captures')
     logging.info('End of capture')
