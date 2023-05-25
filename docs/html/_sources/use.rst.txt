@@ -63,6 +63,12 @@ nexstar (optional part) :
 
 * port = the usb port used by the telescope
 
+* max_test = the number max of centering test. If centering not corect after this number of test, the programm return an error, the telescope go to 0,0 alt/az position and the programm exit
+
+* utc = your offset from the utc time
+
+* daylight = 1 to enable Daylight Savings and 0 for Standard Time
+
 
 Initialisation
 --------------
