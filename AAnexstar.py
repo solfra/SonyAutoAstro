@@ -199,8 +199,8 @@ def mouv_telescope_variable(scope, direction, rate, duration=1) :
     elif direction[1] == "neg" :
         p=7
     
-    rateH = (rate*4)//256
-    rateL = (rate*8)%256
+    rateH = int((rate*4)//256)
+    rateL = int((rate*8)%256)
 
     track = get_tracking(scope)
     if track !=0 :
@@ -238,8 +238,7 @@ def get_time(scope,print_offset=False) :
     h = ord(result[0])
     if h < dif_utc :
         d=d-1
-        h=(h-dif_utc)%24
-    t = '20'+str(ord(result[5]))+'-'+str(ord(result[3]))+'-'+str(d)+' '+str(h)+':'+str(ord(result[1]))+':'+str(ord(result[2]))
+    t = '20'+str(ord(result[5]))+'-'+str(ord(result[3]))+'-'+str(d)+' '+str((h-dif_utc)%24)+':'+str(ord(result[1]))+':'+str(ord(result[2]))
     if print_offset :
         print("utc+",str(ord(result[6])))
         print("Heure ete ? ",str(ord(result[7])))
@@ -350,7 +349,7 @@ def sync_precise_ra_dec(scope,ra,dec):
 
 #def set_location(scope) :
 
-def set_time(scope,utc=1,daylight=1) :
+def set_time(scope,utc=1,daylight=0) :
     """
     Set the telescopet time to the computer time
 

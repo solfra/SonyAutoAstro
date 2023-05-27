@@ -103,6 +103,7 @@ while test_img :
 #-------------------- Capture des images --------------------
 logging.info("Start image capture")
 capt  = True
+centering = False
 
 while capt : 
     if int(config['sky_object']['nbrPict']) == 0 :
@@ -126,15 +127,14 @@ while capt :
             centering = True
             i_center = 1
         
-        if i_center > int(config['nexstar']['max_test']) :
-            print("Error in centering, make it manualy")
-            logging.error("Error in centering, make it manualy")
-            logging.info('End of the programm')
-            print("End of the programm")
-            goto_precise_azm_alt(scope, 0,0)
-            exit()
-
         if centering :
+            if i_center > int(config['nexstar']['max_test']) :
+                print("Error in centering, make it manualy")
+                logging.error("Error in centering, make it manualy")
+                logging.info('End of the programm')
+                print("End of the programm")
+                goto_precise_azm_alt(scope, 0,0)
+                exit()
             logging.info("Check image coordinates")
             f=name+'_'+str(i)+'.arw'
             raw = rawpy.imread(f)

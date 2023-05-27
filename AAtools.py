@@ -188,13 +188,13 @@ def astromerty_img(config, ast, c_obj, fits_file):
         print("Separation obj image :",sep.arcmin,"arcmin")
         logging.info("Separation obj image : %s arcmin",sep.arcmin)
         print("Plus precisement :",(c_obj.ra.deg - c_img.ra.deg)*60, "arcmin en RA et", (c_obj.dec.deg - c_img.dec.deg)*60,"arcmin en DEC")
-        if sep > max(fov) :
+        if sep.arcmin > max(fov) :
             print("Cible hors champ !")
-            print("Objects dans le champ actuel : ")
-            simbad_query(ra,dec,fov=max(fov)*60)
+            #print("Objects dans le champ actuel : ")
+            #simbad_query(ra,dec,fov=max(fov)*60)
     else :
-        print("Objects dans le champ actuel : ")
-        simbad_query(ra,dec,fov=max(fov)*60)
+        print("Check astrometry result for knowing the object in your image")
+        #simbad_query(ra,dec,fov=max(fov)*60)
     return c_img, fov
 
 def nexstar_info(scope):
@@ -233,7 +233,9 @@ def nexstar_obj_centering(scope,c_obj, c_img,t, lat, long):
     if c_obj.separation(c_scope).deg > 7 :
         goto_precise_ra_dec(scope,c_obj.ra.deg,c_obj.dec.deg)
         logging.info("Go to the object position")
+        print("Go to the object position")
     else :
+        print("Calculation of the necessary diasplacement")
         logging.info("Set observatory position in space and time")
         observing_location = EarthLocation(lat=lat, lon=long, height=250*u.m)  
         observing_time = Time(t)  
