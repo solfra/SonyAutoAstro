@@ -45,12 +45,15 @@ if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord']
     obj = Simbad.query_object(config['sky_object']['name'])
     logging.info("Objet : %s", obj)
     try:
-        c_obj = SkyCoord([obj['RA'][0]+" "+obj['DEC'][0]], unit=(u.hourangle, u.deg))
+        c_obj = SkyCoord(obj['RA'][0]+" "+obj['DEC'][0], unit=(u.hourangle, u.deg))
         logging.info("coord : %s", c_obj)
     except :
         print('error in object query')
         logging.error("Error in object query")
         exit()
+else : 
+    print("You can not take astrometry because no object coordinate")
+    logging.warning("Astrometry is impossible, no object coordinate")
 
 
 #-------------------- Test du systèmes-------------------- 
