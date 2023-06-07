@@ -31,6 +31,7 @@ def img_read(file):
     rgb (3d array) = image array
     '''
     logging.info("read image")
+    print("read image")
     raw = rawpy.imread(file)
     rgb = raw.postprocess(use_camera_wb=True)
     raw.close()
@@ -51,6 +52,7 @@ def astrometry(file,ast):
     Output :
     wcs_header = result of the astrometry
     '''
+    logging.info("Submission to nova.astrometry.net")
     try_again = True
     submission_id = None
     while try_again:

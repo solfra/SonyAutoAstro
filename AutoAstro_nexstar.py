@@ -75,6 +75,7 @@ i=0 #numero de l'image test
 
 while test_img :
     logging.info("Capture image test %s", i)
+    t = get_time(scope)
     os.system("gphoto2 --port={} --filename=test{}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,i))
     
     rgb=img_read('test{}.arw'.format(i))
@@ -87,12 +88,18 @@ while test_img :
         fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
         c_img, fov = astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
 
-        continue_test = input("\nQue voulez vous faire ? \nSyncronisation telescope (s) \nContinuer test (Y/n) ")
+        continue_test = input("\nQue voulez vous faire ? \nSyncronisation telescope (s) \nCentrer le telescope (m) \nContinuer test (Y/n) ")
+
+        if continue_test == "m" or continue_test == "M":
+            logging.info("move the telescope to the right position")
+            nexstar_obj_centering(scope,c_obj,c_img,t, lat,long)
+            continue_test = input("\nQue voulez vous faire ? \nContinuer test (Y/n) ")
     
         if continue_test=='s' or continue_test == 'S' :
             logging.info("Sync mount with last coord obtened by astrometry")
             print("Syncronisation du telescope avec les derniere coordonnes obtenue par astrometrie")
             sync_precise_ra_dec(scope,c_img.ra.deg,c_img.dec.deg)
+            continue_test = input("\nQue voulez vous faire ? \nContinuer test (Y/n) ")
 
     if continue_test == "N" or continue_test == "n" :
         logging.info("End of systeme test")
