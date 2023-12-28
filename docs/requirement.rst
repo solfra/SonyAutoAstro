@@ -1,0 +1,7 @@
+Requirement
+===========
+
+- gphoto 
+- astrometry.net api key
+- python 3
+- rawpy ; keyring ; astroquery ; astropy ; numpy ; maplotlib
