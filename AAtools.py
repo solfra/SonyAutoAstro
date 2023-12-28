@@ -199,6 +199,53 @@ def astromerty_img(config, ast, c_obj, fits_file):
         #simbad_query(ra,dec,fov=max(fov)*60)
     return c_img, fov
 
+def astromerty_img2(config, ast, c_obj, fits_file,solver="astrometry"):
+    """
+    Get the astrometry of an image and make some calculation
+
+    Input :
+    config = the config file object
+    ast = the astrometry object
+    c_obj = the coordinates of the object (astropy.coordinates.Skycoord format)
+    fits_file = the name of the file you want to analyse
+    solver = astrometry (with internet) or astap (in local)
+
+    Output :
+    c_img = coordinate of the image (astropy.coordinates.Skycoord format)
+    """
+    if solver == "astrometry" :
+        result_ast=astrometry(fits_file,ast)
+        fits.writeto('heder_result.fits', [], result_ast,overwrite=True)
+        ra, dec = get_coord(result_ast)
+        fov = get_fov(result_ast)
+    elif solver == "astap" :
+        print(c_obj)
+        os.system("astap -f "+ fits_file + " -ra " + str(c_obj.ra.hourangle) + " -spd " + str(c_obj.dec.deg+90)+ " -wcs")
+        try :
+            res = fits.open(fits_file[:-5]+".wcs")
+        except :
+            print("no astrometry solution")
+            exit()
+        result_ast = res[0].header 
+        ra, dec = get_coord(result_ast)
+        fov = (result_ast["CDELT2"]*60*5000,result_ast["CDELT2"]*60*3000) #a revoir, faut multiplier par le vrai nbr de pixel du capteur 
+        
+    if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord'] == 'Y' :
+        c_img = SkyCoord(ra*u.deg,dec*u.deg)
+        sep = c_img.separation(c_obj)
+        print("Separation obj image :",sep.arcmin,"arcmin")
+        logging.info("Separation obj image : %s arcmin",sep.arcmin)
+        print("Plus precisement :",(c_obj.ra.deg - c_img.ra.deg)*60, "arcmin en RA et", (c_obj.dec.deg - c_img.dec.deg)*60,"arcmin en DEC")
+        print(sep, fov)
+        if sep.arcmin > max(fov) :
+            print("Cible hors champ !")
+            #print("Objects dans le champ actuel : ")
+            #simbad_query(ra,dec,fov=max(fov)*60)
+    else :
+        print("Check astrometry result for knowing the object in your image")
+        #simbad_query(ra,dec,fov=max(fov)*60)
+    return c_img, fov
+
 def nexstar_info(scope):
     """
     Print the information of the nexstar telescope
