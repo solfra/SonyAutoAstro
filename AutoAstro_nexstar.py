@@ -13,21 +13,41 @@ from AAtools import *
 import serial
 from AAnexstar import *
 import logging
+import argparse
 
 #-------------------- Inisialisation systèmes-------------------- 
 logging.basicConfig(filename="AutoAstro.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
-logging.info("Check config file")
-cfg_check()
+parser = argparse.ArgumentParser(description='Auto_astro')
+parser.add_argument('--config',help='Config file name',default='AA.cfg')
+args = parser.parse_args()
+
+conf_name=args.config
+
 config = configparser.ConfigParser()
 logging.info("Read config file")
-config.read('AA.cfg')
+config.read(conf_name)
+
+try:
+    port = config['gphoto']['port']
+    key = config['astrometry']['user']
+    check_img = config['astrometry'].getint('check_every_x_imgs')
+    sky_coord = config['sky_object'].getboolean('get_coord')
+    image_nbr = config['sky_object'].getint('nbrpict')
+    name = config['sky_object']['name']
+    nexstar_port = config['nexstar']['port'] 
+    utc=config['nexstar'].getint('UTC')
+    daylight=config['nexstar'].getint('daylight')
+    nexstar_max_test = config['nexstar'].getint('max_test')
+except :
+    print('Error in config file, exit')
+    logging.error('! Erro in config file, exit')
+    exit()
 
 internet_verif() #verifie qu'une conection internet est bien presente
 
 logging.info("Astrometry start")
 ast = AstrometryNet()
-key = config['astrometry']['user']
 ast.api_key = keyring.get_password('astroquery:astrometry_net', key)
 
 logging.info("gphoto2 inisialisation")
@@ -35,14 +55,12 @@ os.system("gphoto2 --list-ports")
 os.system("gphoto2 --auto-detect ")
 os.system("gphoto2 --summary")
 
-if config['gphoto']['port'] == '?' :
+if port == '?' :
     port = input("Entrer le nom du port USB a utiliser pour l'appareil photo : ")
-else :
-    port = config['gphoto']['port']
 logging.info("Port used for gphoto2 : %s", port)
 
 
-if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord'] == 'Y' :
+if sky_coord :
     logging.info("Get coordinate of the object")
     obj = Simbad.query_object(config['sky_object']['name'])
     logging.info("Objet : %s", obj)
@@ -58,14 +76,13 @@ else :
     logging.warning("Astrometry is impossible, no object coordinate")
 
 logging.info("Nexstar inisialisation")
-if config['nexstar']['port'] == '?' :
+if nexstar_port == '?' :
     nexstar_port = input("Nexstar usb port : ")
-else :
-    nexstar_port = config['nexstar']['port'] 
+    
 logging.info("Nexstar port %s", nexstar_port)
 logging.info("Start nexstar serial port")
 scope = serial.Serial(nexstar_port)
-set_time(scope,utc=int(config['nexstar']['UTC']),daylight=int(config['nexstar']['daylight']))
+set_time(scope,utc=utc,daylight=daylight)
 nexstar_info(scope)
 lat,long = get_location(scope)
 
@@ -81,7 +98,7 @@ while test_img :
     t = get_time(scope)
     os.system("gphoto2 --port={} --filename=test{}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,i))
     
-    rgb=img_read('test{}.arw'.format(i))
+    rgb=img_read('test{}.arw'.format(i),print_img=True)
 
     continue_test = input("\nQue voulez vous faire ? \nAstrometrie (a) \nContinuer test (Y/n) ")
     
@@ -89,7 +106,7 @@ while test_img :
         logging.info("Astrometry of the image")
         f='test{}.arw'.format(i)
         fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-        c_img, fov = astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
+        c_img, fov = astromerty_img(sky_coord, ast, c_obj, 'test{}_b.fits'.format(i))
 
         continue_test = input("\nQue voulez vous faire ? \nSyncronisation telescope (s) \nCentrer le telescope (m) \nContinuer test (Y/n) ")
 
@@ -116,29 +133,25 @@ capt  = True
 centering = False
 
 while capt : 
-    if int(config['sky_object']['nbrPict']) == 0 :
-        nbr = int(input('Combien de photo à prendre ? '))
-    else : 
-        nbr = int(config['sky_object']['nbrPict'])
-    logging.info("Number of image you want : %s", nbr)
+    if image_nbr == 0 :
+        image_nbr = int(input('Combien de photo à prendre ? '))
+    logging.info("Number of image you want : %s", image_nbr)
 
-    if config['sky_object']['name'] == '?' :
+    if name == '?' :
         name = input('Quel est le nom des images ? ')
-    else :
-        name = config['sky_object']['name']
     logging.info("Object name : %s", name)
     
-    for i in range(nbr):
+    for i in range(image_nbr):
         logging.info("Capture image %s", i)
         t = get_time(scope)
-        os.system("gphoto2 --port={} --filename={}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,name+'_'+str(i)))
+        os.system(f"gphoto2 --port={port} --filename={name}_{str(i)}.arw  --trigger-capture --wait-event-and-download=FILEADDED")
         
-        if int(config['astrometry']['check_every_x_imgs']) != 0 and i % int(config['astrometry']['check_every_x_imgs']) == 0 and i!=0:
+        if check_img != 0 and i % check_img == 0 and i!=0:
             centering = True
             i_center = 1
         
         if centering :
-            if i_center > int(config['nexstar']['max_test']) :
+            if i_center > nexstar_max_test  :
                 print("Error in centering, make it manualy")
                 logging.error("Error in centering, make it manualy")
                 logging.info('End of the programm')
@@ -147,12 +160,10 @@ while capt :
                 exit()
             logging.info("Check image coordinates")
             f=name+'_'+str(i)+'.arw'
-            raw = rawpy.imread(f)
-            rgb = raw.postprocess(use_camera_wb=True)
-            raw.close()
+            rgb = img_read(f)
             logging.info("convert into fits file")
             fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-            c_img, fov = astromerty_img(config, ast, c_obj, f[:-4]+'_b.fits')
+            c_img, fov = astromerty_img(sky_coord, ast, c_obj, f[:-4]+'_b.fits')
             if abs(c_img.separation(c_obj).arcmin) > max(fov)/2 :
                 logging.info("Nexstar centering")
                 nexstar_obj_centering(scope,c_obj,c_img,t, lat,long)

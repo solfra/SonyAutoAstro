@@ -20,7 +20,7 @@ from astropy.coordinates import AltAz
 
 #--------------------- Fonction -------------------- 
 
-def img_read(file):
+def img_read(file,print_img=False):
     '''
     Read and print a raw image from Sony camera
 
@@ -35,9 +35,10 @@ def img_read(file):
     raw = rawpy.imread(file)
     rgb = raw.postprocess(use_camera_wb=True)
     raw.close()
-    logging.info("print image")
-    plt.imshow(rgb)
-    plt.show()
+    if print_img:
+        logging.info("print image")
+        plt.imshow(rgb)
+        plt.show()
     return rgb
 
 def astrometry(file,ast):
@@ -105,34 +106,6 @@ def simbad_query(ra, dec, fov = 0.44) :
     result = Simbad.query_criteria('ra>'+str(minRA)+'&ra<'+str(maxRA)+'&dec>'+str(minDEC)+'&dec<'+str(maxDEC),cat='NGC')
     print(result)
 
-def cfg_check(file='AA.cfg'):
-    """
-    Check the config file is ok
-
-    Input :
-    file = the config file
-
-    Output :
-    None, just print the result and writ it in the log file
-    """
-    config = configparser.ConfigParser()
-    try :
-        config.read(file)
-        int(config['sky_object']['nbrPict'])
-        key = config['astrometry']['user']
-        keyring.get_password('astroquery:astrometry_net', key)
-        int(config['astrometry']['check_every_x_imgs'])
-        int(config['nexstar']['max_test'])
-        int(config['nexstar']['daylight'])
-        int(config['nexstar']['UTC'])
-    except :
-        print("Error in config file")
-        logging.error("Error in config file")
-        exit()
-    else :
-        print("Config file OK")
-        logging.info("config file ok")
-
 def get_fov(header):
     """
     Get the fov of an image with is header of is plate solve
@@ -162,16 +135,18 @@ def internet_verif():
         urlopen('https://www.google.com')
         print("internet is OK")
         logging.info("Internet is ok")
+        return True
     except :
         print('Error ! Internet not conected !!!!!!!!!!!!!!!!')
         logging.error("Internet not conected")
+        return False
 
-def astromerty_img(config, ast, c_obj, fits_file):
+def astromerty_img(get_coord, ast, c_obj, fits_file):
     """
     Get the astrometry of an image and make some calculation
 
     Input :
-    config = the config file object
+    get_coord = config['sky_object'].getboolean('get_coord')
     ast = the astrometry object
     c_obj = the coordinates of the object (astropy.coordinates.Skycoord format)
     fits_file = the name of the file you want to analyse
@@ -184,7 +159,7 @@ def astromerty_img(config, ast, c_obj, fits_file):
     ra, dec = get_coord(result_ast)
     fov = get_fov(result_ast)
 
-    if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord'] == 'Y' :
+    if get_coord :
         c_img = SkyCoord(ra*u.deg,dec*u.deg)
         sep = c_img.separation(c_obj)
         print("Separation obj image :",sep.arcmin,"arcmin")

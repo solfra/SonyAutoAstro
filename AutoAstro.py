@@ -11,21 +11,37 @@ from astroquery.simbad import Simbad
 import configparser
 import logging
 from AAtools import *
+import argparse
 
 #-------------------- Inisialisation systèmes-------------------- 
 logging.basicConfig(filename="AutoAstro.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
-logging.info("Check config file")
-cfg_check()
+parser = argparse.ArgumentParser(description='Auto_astro')
+parser.add_argument('--config',help='Config file name',default='AA.cfg')
+args = parser.parse_args()
+
+conf_name=args.config
+
 config = configparser.ConfigParser()
 logging.info("Read config file")
-config.read('AA.cfg')
+config.read(conf_name)
+
+try:
+    port = config['gphoto']['port']
+    key = config['astrometry']['user']
+    sky_coord = config['sky_object'].getboolean('get_coord')
+    image_nbr = config['sky_object'].getint('nbrpict')
+    name = config['sky_object']['name']
+    check_img = config['astrometry'].getint('check_every_x_imgs')
+except :
+    print('Error in config file, exit')
+    logging.error('! Erro in config file, exit')
+    exit()
 
 internet_verif() #verifie qu'une conection internet est bien presente
 
 logging.info("Astrometry start")
 ast = AstrometryNet()
-key = config['astrometry']['user']
 ast.api_key = keyring.get_password('astroquery:astrometry_net', key)
 
 logging.info("gphoto2 inisialisation")
@@ -33,14 +49,11 @@ os.system("gphoto2 --list-ports")
 os.system("gphoto2 --auto-detect ")
 os.system("gphoto2 --summary")
 
-if config['gphoto']['port'] == '?' :
-    port = input("Entrer le nom du port USB a utiliser pour l'appareil photo : ")
-else :
-    port = config['gphoto']['port']
+if port == '?' :
+    port = input("Name of the camera port : ")
 logging.info("Port used for gphoto2 : %s", port)
 
-
-if config['sky_object']['get_coord'] == 'y' or config['sky_object']['get_coord'] == 'Y' :
+if  sky_coord:
     logging.info("Get coordinate of the object")
     obj = Simbad.query_object(config['sky_object']['name'])
     logging.info("Objet : %s", obj)
@@ -55,19 +68,16 @@ else :
     print("You can not take astrometry because no object coordinate")
     logging.warning("Astrometry is impossible, no object coordinate")
 
-
-#-------------------- Test du systèmes-------------------- 
+#-------------------- Systeme test -------------------- 
 logging.info("Start systeme test")
 test_img = True
 i=0 #numero de l'image test
 
-
-
 while test_img :
     logging.info("Capture image test %s", i)
-    os.system("gphoto2 --port={} --filename=test{}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,i))
+    os.system(f"gphoto2 --port={port} --filename=test{i}.arw  --trigger-capture --wait-event-and-download=FILEADDED")
     
-    rgb=img_read('test{}.arw'.format(i))
+    rgb=img_read(f'test{i}.arw',print_img=True)
 
     continue_test = input("\nQue voulez vous faire ? \nAstrometrie (a) \nContinuer test (Y/n) ")
     
@@ -76,7 +86,7 @@ while test_img :
         f='test{}.arw'.format(i)
         fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
 
-        astromerty_img(config, ast, c_obj, 'test{}_b.fits'.format(i))
+        astromerty_img(sky_coord, ast, c_obj, 'test{}_b.fits'.format(i))
 
         continue_test = input("\nQue voulez vous faire ? \nContinuer test (Y/n) ")
 
@@ -92,31 +102,26 @@ logging.info("Start image capture")
 capt  = True
 
 while capt : 
-    if int(config['sky_object']['nbrPict']) == 0 :
-        nbr = int(input('Combien de photo à prendre ? '))
-    else : 
-        nbr = int(config['sky_object']['nbrPict'])
-    logging.info("Number of image you want : %s", nbr)
+    if image_nbr == 0 :
+        image_nbr = int(input('Number of image?  '))
+
+    logging.info("Number of image you want : %s", image_nbr)
     
-    if config['sky_object']['name'] == '?' :
-        name = input('Quel est le nom des images ? ')
-    else :
-        name = config['sky_object']['name']
+    if name == '?' :
+        name = input('Image Name? ')
     logging.info("Object name : %s", name)
     
-    for i in range(nbr):
+    for i in range(image_nbr):
         logging.info("Capture image %s", i)
-        os.system("gphoto2 --port={} --filename={}.arw  --trigger-capture --wait-event-and-download=FILEADDED".format(port,name+'_'+str(i)))
+        os.system(f"gphoto2 --port={port} --filename={name}_{str(i)}.arw  --trigger-capture --wait-event-and-download=FILEADDED")
         
-        if int(config['astrometry']['check_every_x_imgs']) != 0 and i % int(config['astrometry']['check_every_x_imgs']) == 0 and i!=0:
+        if check_img != 0 and i % check_img == 0 and i!=0:
             logging.info("check coord image")
             f=name+'_'+str(i)+'.arw'
-            raw = rawpy.imread(f)
-            rgb = raw.postprocess(use_camera_wb=True)
-            raw.close()
+            rgb = img_read(f)
             logging.info("Convert into fits file")
             fits.writeto(f[:-4]+'_b.fits',rgb[:,:,2],overwrite=True)
-            astromerty_img(config, ast, c_obj, f[:-4]+'_b.fits')
+            astromerty_img(sky_coord, ast, c_obj, f[:-4]+'_b.fits')
 
     print('\n**************\nFin des captures')
     logging.info('End of capture')
