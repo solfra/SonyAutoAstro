@@ -1,8 +1,12 @@
-import rawpy
 from astropy.io import fits
 from AAtools import img_read
+import argparse
 
-file=input("Images a lire : ")
+parser = argparse.ArgumentParser(description='Transforme raw file into rgb fits files')
+parser.add_argument('file')
+args = parser.parse_args()
+
+file=args.file
 
 rgb = img_read(file)
 
